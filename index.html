@@ -404,37 +404,31 @@
 			let name = nameInput.value.trim();
 			let rawUrl = urlInput.value.trim();
 
-			if (!name || !rawUrl) return alert("Заполните все поля!");
+			if (!name || !rawUrl) return alert("Заполните поля!");
 
-			let cleanUrl = "";
+			// 1. Очищаем ссылку от кавычек и кода iframe, если его вставили целиком
+			let cleanUrl = rawUrl.replace(/<iframe[^>]*src=["']|["'][^>]*><\/iframe>/gi, '').replace(/["']/g, '').trim();
 
-			// 1. Если вставили весь тег <iframe>, вытаскиваем ссылку
-			if (rawUrl.includes('src=')) {
-				const match = rawUrl.match(/src="([^"]+)"/);
-				cleanUrl = match ? match[1] : rawUrl;
-			} else {
-				cleanUrl = rawUrl;
+			// 2. Если вставили ссылку для редактирования, исправляем на публикацию
+			if (cleanUrl.includes('/edit')) {
+				cleanUrl = cleanUrl.split('/edit')[0] + '/pubhtml';
 			}
 
-			// 2. Убираем лишние пробелы и кавычки по краям
-			cleanUrl = cleanUrl.replace(/["']/g, "").trim();
-
-			// 3. Исправляем ссылку для редактирования на ссылку для публикации
-			if (cleanUrl.includes('/edit')) {
-				// Если это ссылка из браузера, она не будет работать без публикации!
-				alert("ОШИБКА: Вы вставили ссылку для редактирования. Нужно использовать меню 'Опубликовать в интернете' -> 'Встроить'.");
-				return;
+			// 3. Убираем всё, что идет после pubhtml (старые параметры), чтобы добавить свои заново
+			if (cleanUrl.includes('pubhtml')) {
+				cleanUrl = cleanUrl.split('pubhtml')[0] + 'pubhtml';
 			}
 
 			const newId = 'tab_' + Date.now();
+			// Сохраняем ТОЛЬКО чистую ссылку
 			const newTab = { id: newId, name: name, url: cleanUrl };
 
 			customTabs.push(newTab);
 			localStorage.setItem('customTabs', JSON.stringify(customTabs));
 			
-			toggleAddModal();
 			location.reload(); 
 		}
+
 
 		function renderTabs() {
 			const nav = document.querySelector('.nav-tabs');
@@ -473,7 +467,8 @@
 					const frameDiv = document.createElement('div');
 					frameDiv.id = tab.id;
 					frameDiv.className = 'table-frame';
-					frameDiv.innerHTML = `<iframe src="${tab.url}?widget=false&headers=false&chrome=false&rm=minimal&rp=false&single=true"></iframe>`;
+					// Найдите эту строку внутри renderTabs и замените её:
+					frameDiv.innerHTML = `<iframe src="${tab.url}?rm=minimal"></iframe>`;
 					content.appendChild(frameDiv);
 				}
 			});

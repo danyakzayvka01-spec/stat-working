@@ -246,8 +246,8 @@
 				</div>
 				
 				<!-- Ваши стандартные кнопки -->
-				<button class="tab-btn active" onclick="openTab(event, 'tab1')">📊 Статистика заявки/закрыв</button>
-				<button class="tab-btn" onclick="openTab(event, 'tab2')">📊 Статистика холодных звонков</button>
+				<button class="tab-btn active" onclick="openTab(event, 'tab1')">👥 Статистика заявки/закрыв</button>
+				<button class="tab-btn" onclick="openTab(event, 'tab2')">👥 Статистика холодных звонков</button>
 				
 				<!-- Сюда JavaScript будет автоматически добавлять новые таблицы -->
 			</nav>
@@ -442,11 +442,16 @@
 		}
 
 		function renderTabs() {
-			const nav = document.getElementById('tabsList'); // Указываем на наш контейнер
-			if (!nav) return;
+			const nav = document.getElementById('tabsList');
+			const content = document.querySelector('.main-content'); // Находим область для таблиц
+
+			if (!nav || !content) return;
 
 			customTabs.forEach(tab => {
+				// Проверяем, не создана ли уже кнопка для этой таблицы
 				if (!document.getElementById('wrapper_' + tab.id)) {
+					
+					// 1. Создаем кнопку в боковом меню
 					const wrapper = document.createElement('div');
 					wrapper.className = 'tab-btn-wrapper';
 					wrapper.id = 'wrapper_' + tab.id;
@@ -454,11 +459,9 @@
 					const btn = document.createElement('button');
 					btn.className = 'tab-btn';
 					btn.id = 'btn_' + tab.id;
-					// Добавляем иконку папки для новых таблиц
-					btn.innerHTML = `📁 ${tab.name}`; 
+					btn.innerHTML = `👥 ${tab.name}`;
 					btn.onclick = (e) => openTab(e, tab.id);
 
-					// Кнопка удаления (крестик)
 					const delBtn = document.createElement('button');
 					delBtn.className = 'delete-tab-btn';
 					delBtn.innerHTML = '×';
@@ -466,7 +469,16 @@
 
 					wrapper.appendChild(btn);
 					wrapper.appendChild(delBtn);
-					nav.appendChild(wrapper); // Теперь добавится ВНУТРЬ списка, но ВЫШЕ кнопки "Добавить"
+					nav.appendChild(wrapper);
+
+					// 2. СОЗДАЕМ САМУ ТАБЛИЦУ (iframe) — это то, чего не хватало
+					const frameDiv = document.createElement('div');
+					frameDiv.id = tab.id;
+					frameDiv.className = 'table-frame';
+					// Вставляем вашу ссылку с параметром минимального интерфейса
+					frameDiv.innerHTML = `<iframe src="${tab.url}?rm=minimal"></iframe>`;
+					
+					content.appendChild(frameDiv); // Добавляем таблицу в основную область
 				}
 			});
 		}

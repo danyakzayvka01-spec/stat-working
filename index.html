@@ -2,26 +2,154 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Мой Дашборд</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления данными</title>
     <style>
-        body { font-family: sans-serif; margin: 20px; }
-        .table-container { margin-bottom: 40px; }
-        iframe { width: 100%; height: 500px; border: 1px solid #ccc; }
+        :root {
+            --bg-color: #0f0f0f;
+            --sidebar-color: #1a1a1a;
+            --accent-color: #00d4ff;
+            --text-color: #f0f0f0;
+            --card-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Боковая панель */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-color);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #333;
+        }
+
+        .profile {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .profile img {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #00d4ff, #0055ff);
+            margin-bottom: 12px;
+            object-fit: cover;
+        }
+
+        .profile-name { font-weight: 600; font-size: 1.1em; }
+        .status { font-size: 0.75em; color: #4caf50; margin-top: 5px; }
+
+        /* Вкладки */
+        .nav-tabs { display: flex; flex-direction: column; gap: 8px; }
+        
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #999;
+            padding: 14px 18px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            font-size: 0.95em;
+        }
+
+        .tab-btn:hover { background: #252525; color: #fff; }
+        .tab-btn.active {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* Основной контент */
+        .main-content {
+            flex-grow: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-header { margin-bottom: 20px; }
+        .table-header h2 { margin: 0; font-size: 1.5em; color: var(--accent-color); }
+
+        .table-wrapper {
+            background: #fff; /* Сама подложка белая, чтобы данные были видны четко */
+            border-radius: 16px;
+            overflow: hidden;
+            flex-grow: 1;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none; 
+        }
+
+        .table-wrapper.active { display: block; }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 <body>
-    <h1>Актуальная информация</h1>
 
-    <div class="table-container">
-        <h2>Таблица 1: Продажи</h2>
-        <!-- Вставьте сюда первый код iframe из Google -->
-        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQP0KFNEsju_dn8jLRzerBOCGjmRJFQcQpvhj2SJ5n4YZ9yj2kNRSn-ENLp6KyNk8shzSJyNaIrz-Wu/pubhtml?widget=true&amp;headers=false"></iframe>
+    <div class="sidebar">
+        <div class="profile">
+            <img src="https://ui-avatars.com" alt="Avatar">
+            <div class="profile-name">Администратор</div>
+            <div class="status">● В сети</div>
+        </div>
+        
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'tab1')">📊 Таблица Продаж</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab2')">📦 Состояние Склада</button>
+        </nav>
     </div>
 
-    <div class="table-container">
-        <h2>Таблица 2: Склад</h2>
-        <!-- Вставьте сюда второй код iframe из Google -->
-        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vR8_u0roWMELlRRvbJ1f3AoqHQSFtUT5i2KLiIvyf5ZLx4oSAOOoE5W_Gu-TR4DJNQ4ZUBsSiZ-6wAn/pubhtml?widget=true&amp;headers=false"></iframe>
+    <div class="main-content">
+        <div class="table-header">
+            <h2 id="table-title">Таблица Продаж</h2>
+        </div>
+
+        <!-- Контейнер для Таблицы 1 -->
+        <div id="tab1" class="table-wrapper active">
+            <iframe src="https://google.com"></iframe>
+        </div>
+
+        <!-- Контейнер для Таблицы 2 -->
+        <div id="tab2" class="table-wrapper">
+            <iframe src="https://google.com"></iframe>
+        </div>
     </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, x, tablinks;
+            x = document.getElementsByClassName("table-wrapper");
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active");
+            document.getElementById('table-title').innerText = evt.currentTarget.innerText.trim();
+        }
+    </script>
+
 </body>
 </html>

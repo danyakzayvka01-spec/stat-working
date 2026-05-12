@@ -239,11 +239,23 @@
                 <div style="font-weight: 700;">Проверенный пользователь</div>
                 <div style="color:#4caf50; font-size:11px;">● В сети</div>
             </div>
-            <nav class="nav-tabs">
-                <button class="tab-btn active" onclick="openTab(event, 'tab1')">👥 Статистика заявки/закрыв</button>
-                <button class="tab-btn" onclick="openTab(event, 'tab2')">👥 Статистика холодных звонков</button>
-				<button class="add-tab-btn" onclick="toggleAddModal()">+ Добавить таблицу</button>
-            </nav>
+            <nav class="nav-tabs" id="tabsList">
+				<!-- Заголовок над таблицами -->
+				<div style="font-size: 11px; font-weight: 700; color: #555; letter-spacing: 1.5px; margin: 20px 0 10px 5px; text-transform: uppercase;">
+					ТАБЛИЦЫ
+				</div>
+				
+				<!-- Ваши стандартные кнопки -->
+				<button class="tab-btn active" onclick="openTab(event, 'tab1')">📊 Статистика заявки/закрыв</button>
+				<button class="tab-btn" onclick="openTab(event, 'tab2')">📊 Статистика холодных звонков</button>
+				
+				<!-- Сюда JavaScript будет автоматически добавлять новые таблицы -->
+			</nav>
+
+			<!-- Кнопка добавления ТЕПЕРЬ СНАРУЖИ навигации, чтобы всегда быть внизу -->
+			<button class="add-tab-btn" onclick="toggleAddModal()" style="margin-top: 15px; width: 100%; background: transparent; border: 1px dashed #333; color: var(--accent-color); padding: 12px; border-radius: 12px; cursor: pointer;">
+				+ Добавить таблицу
+			</button>
 				<div id="addModal" class="settings-panel" style="display: none;">
 					<div class="settings-box">
 					<h3>➕ Новая таблица</h3>
@@ -429,47 +441,32 @@
 			location.reload(); 
 		}
 
-
 		function renderTabs() {
-			const nav = document.querySelector('.nav-tabs');
-			const content = document.querySelector('.main-content');
+			const nav = document.getElementById('tabsList'); // Указываем на наш контейнер
+			if (!nav) return;
 
 			customTabs.forEach(tab => {
 				if (!document.getElementById('wrapper_' + tab.id)) {
-					// Создаем обертку
 					const wrapper = document.createElement('div');
 					wrapper.className = 'tab-btn-wrapper';
 					wrapper.id = 'wrapper_' + tab.id;
 
-					// Создаем кнопку вкладки
 					const btn = document.createElement('button');
 					btn.className = 'tab-btn';
-					btn.style.width = '100%';
 					btn.id = 'btn_' + tab.id;
-					btn.innerText = '📂 ' + tab.name;
+					// Добавляем иконку папки для новых таблиц
+					btn.innerHTML = `📁 ${tab.name}`; 
 					btn.onclick = (e) => openTab(e, tab.id);
 
-					// Создаем кнопку удаления
+					// Кнопка удаления (крестик)
 					const delBtn = document.createElement('button');
 					delBtn.className = 'delete-tab-btn';
 					delBtn.innerHTML = '×';
-					delBtn.title = 'Удалить таблицу';
-					delBtn.onclick = (e) => {
-						e.stopPropagation(); // Чтобы не сработало открытие вкладки
-						deleteTab(tab.id);
-					};
+					delBtn.onclick = (e) => { e.stopPropagation(); deleteTab(tab.id); };
 
 					wrapper.appendChild(btn);
 					wrapper.appendChild(delBtn);
-					nav.appendChild(wrapper);
-
-					// Создаем контейнер таблицы
-					const frameDiv = document.createElement('div');
-					frameDiv.id = tab.id;
-					frameDiv.className = 'table-frame';
-					// Найдите эту строку внутри renderTabs и замените её:
-					frameDiv.innerHTML = `<iframe src="${tab.url}?rm=minimal"></iframe>`;
-					content.appendChild(frameDiv);
+					nav.appendChild(wrapper); // Теперь добавится ВНУТРЬ списка, но ВЫШЕ кнопки "Добавить"
 				}
 			});
 		}
